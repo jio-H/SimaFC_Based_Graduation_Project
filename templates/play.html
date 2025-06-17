@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>追踪</title>
+    <style>
+        header {
+          background-color: #333;
+          padding: 10px;
+          border-radius: 20px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto;
+        }
+
+        nav ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+        }
+
+        nav li:first-child {
+          grid-column: 1 / 2;
+          justify-self: center;
+        }
+        nav li:last-child {
+          grid-column: 2 / 3;
+          justify-self: center;
+        }
+
+        nav a {
+          color: #fff;
+          text-decoration: none;
+        }
+
+		.rounded-box {
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          padding: 10px;
+            margin-top: 10px;
+          overflow-y: scroll;
+          max-height: 400px;
+        }
+        .file {
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        .play {
+            width: 500px;
+            height: 500px;
+            background-color: #eee;
+            border: 2px dashed #ccc;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .play label {
+            width: 500px;
+            height: 500px;
+            justify-content: center;
+            align-items: center;
+          color: #666;
+          font-size: 18px;
+          cursor: pointer;
+          padding: 10px;
+            margin-bottom: -450px;
+            text-align: center;
+        }
+        .play div{
+            color: #666;
+          font-size: 18px;
+        }
+        .play input[type="file"] {
+          display: none;
+        }
+        .play:hover {
+          border: 2px dashed #333;
+        }
+        .play:active {
+          border: 2px dashed #000;
+        }
+
+        .box {
+            width: 500px;
+            height: 500px;
+            background-color: #eee;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .submit {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .submit button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    .play {
+      margin: 0 auto;
+      max-width: 500px;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .play select {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #555;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .play button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #337ab7;
+      border: none;
+      border-radius: 4px;
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .play button:hover {
+      background-color: #286090;
+    }
+
+    .box {
+      margin: 0 auto;
+      max-width: 800px;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+	</style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">我的视频</a></li>
+        </ul>
+    </nav>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('pre') }}">目标追踪</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <main>
+		<div class="box">
+            <img id="pu" src="{{ url_for('video_feed', filepath=filepath) }}">
+        </div>
+		<div class="box">
+            <img id="bg" src="{{ url_for('video', filepath=filepath) }}">
+		</div>
+
+	</main>
+
+<div class="submit">
+        <button id="but">追踪</button>
+</div>
+
+
+<script src="../static/jquery-3.6.3.js"></script>
+<script>
+
+
+
+</script>
+</body>
+</html>

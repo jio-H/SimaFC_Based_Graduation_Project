@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .container {
+            width: 300px;
+            height: 150px;
+            margin: 100px auto 0;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            margin-left: -10px;
+            border: none;
+            border-radius: 5px;
+
+            box-shadow: 0 0 5px #cccccc;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        input[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+        #login-form {
+            display: block;
+        }
+        #register-form {
+            display: none;
+        }
+        .login-form {
+            margin: 0 auto;
+            opacity: 0.5;
+            border: none;
+            outline: none;
+            display: none;
+        }
+        .login-form:hover{
+            background-color: #3e8e41;
+        }
+        .register-form {
+            display: block; /* 将按钮转换为块级元素 */
+            margin: 0 auto; /* 水平居中 */
+            opacity: 0.5;
+            border: none;
+            outline: none;
+            display: block;
+        }
+        .register-form:hover{
+            background-color: #3e8e41;
+        }
+        #tabs {
+            padding: 10px 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+{% if error != Undefined %}
+    <body onload="alert('{{ error }}');">
+{% endif %}
+<div class="container">
+    <form id="login-form" class="active" method="post" action="{{ url_for('index') }}">
+            <input type="text" name="username" placeholder="用户名" required>
+            <input type="password" name="password" placeholder="密码" required>
+            <input type="submit" name="submit" value="登录">
+    </form>
+    <form id="register-form" method="post" action="{{ url_for('index') }}">
+            <input type="text" name="username" placeholder="用户名" required>
+            <input type="password" name="password" placeholder="密码" required>
+            <input type="submit" name="submit" value="注册">
+    </form>
+
+</div>
+
+<div id="tabs">
+    <button class="login-form" onclick="openForm(event, 'register-form')">返回登录</button>
+    <button class="register-form" onclick="openForm(event, 'login-form')">没有账户,现在注册</button>
+</div>
+
+<script>
+    function openForm(evt, formName) {
+          var i, tabcontent, tablinks, other;
+          console.log(formName)
+          tabcontent = document.getElementById(formName);
+          tabcontent.style.display = "none";
+
+          if(formName == "login-form") {
+              other = "register-form";
+          }
+          else {
+              other = "login-form";
+          }
+            tabcontent = document.getElementById(other);
+          console.log(other)
+            tabcontent.style.display = 'block';
+          document.getElementsByClassName(other)[0].style.display = 'none';
+          document.getElementsByClassName(formName)[0].style.display = 'block';
+        }
+    function login() {
+            // 发送登录请求
+
+            var xhr = new XMLHttpRequest();
+            var form = document.getElementById("login-form");
+            xhr.open("POST", form.action, true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            window.alert("????")
+            xhr.onreadystatechange = function() {
+                console.log(xhr.readyState)
+                console.log(xhr.status)
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                  const  data = JSON.parse(xhr.responseText)
+                    if (data.status === "success") {
+                      window.location.href = "/dashboard";
+                      {#location.reload(true); // 强制刷新并清空缓存#}
+                    } else {
+                      window.alert(data.msg);
+                    }
+              }
+                {#if (xhr.readyState === 4 && xhr.status === 200) {#}
+                {#    var response = JSON.parse(xhr.responseText);#}
+                {#    if (response.status === "success") {#}
+                {#        window.location.href = "/dashboard";#}
+                {#    } else {#}
+                {#        window.alert("???");#}
+                {#    }#}
+                {#}#}
+            };
+            var data = "username=" + encodeURIComponent(form.username.value) + "&password=" + encodeURIComponent(form.password.value);
+            xhr.send(data);
+        }
+    function register() {
+            // 发送注册请求
+            var xhr = new XMLHttpRequest();
+            var form = document.getElementById("register-form");
+            xhr.open("POST", form.action, true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = xhr.responseText;
+                    if (response === "success") {
+                        alert("注册成功，请登录。");
+                        openForm(event, 'login-form');
+                    } else {
+                        alert("注册失败，请重试。");
+                    }
+                }
+            };
+            var data = "username=" + encodeURIComponent(form.username.value) + "&password=" + encodeURIComponent(form.password.value);
+            xhr.send(data);
+        }
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>绘制目标框</title>
+    <link rel="stylesheet" type="text/css" href="static/mystyle1.css">
+</head>
+<body>
+
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">我的视频</a></li>
+        </ul>
+    </nav>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('pre') }}">目标追踪</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <main>
+		<div class="box">
+            <canvas id='cav' width={{ width }} height={{ height }} ></canvas>
+        </div>
+		<div class="box">
+
+		</div>
+
+	</main>
+
+<div class="submit">
+        <button id="but">追踪</button>
+</div>
+
+
+<script src="../static/jquery-3.6.3.js"></script>
+<script>
+
+    function MyPaint(id,color='red'){
+
+        var canvas = document.getElementById(id);
+
+        this.canvas = canvas;
+
+        this.color = color;
+
+        this.ctx = this.canvas.getContext('2d');
+
+        this.p1= {};
+
+        this.p2 = {};
+
+        this.imgObj = new Image();
+        this.imgObj.onload = function() {
+          this.ctx.drawImage(this.imgObj, 0, 0);
+        }.bind(this);
+    }
+
+    MyPaint.prototype.paintRect = function(){
+
+
+
+        var myPaint = this;
+
+        this.imgObj.src = "{{ url_for('adress_video', filepath=filepath) }}";
+
+        this.canvas.addEventListener('mousedown',function(e){
+
+
+            console.info('mousedown',this);
+
+            this.p1.x = e.offsetX;
+
+            this.p1.y = e.offsetY;
+
+            this.canvas.addEventListener("mousemove",myDrect);
+
+            this.canvas.addEventListener("mouseup",function(){
+
+                console.info("mouseup");
+
+                console.info(myDrect);
+
+                this.removeEventListener("mousemove",myDrect);
+
+            })
+
+        }.bind(this));
+
+
+
+        function  myDrect(e){
+
+            myPaint.p2.x = e.offsetX;
+
+            myPaint.p2.y = e.offsetY;
+
+            myPaint.ctx.width = myPaint.width;
+
+            myPaint.ctx.height = myPaint.height;
+
+            myPaint.ctx.fillStyle = '#FF0000';
+
+            myPaint.ctx.strokeStyle = '#FF0000';
+
+            var width = Math.abs(myPaint.p1.x-myPaint.p2.x);
+
+            var height = Math.abs(myPaint.p1.y-myPaint.p2.y);
+
+            myPaint.ctx.clearRect(0,0,myPaint.canvas.width,myPaint.canvas.height);
+
+            myPaint.ctx.drawImage(myPaint.imgObj, 0, 0);
+
+            myPaint.ctx.beginPath();
+            if(myPaint.p2.x>=myPaint.p1.x){
+                if(myPaint.p2.y>=myPaint.p1.y){
+                    myPaint.ctx.rect(myPaint.p1.x,myPaint.p1.y,width,height);
+                }else{
+                    myPaint.ctx.rect(myPaint.p1.x,myPaint.p1.y,width,-height);
+                }
+            }else{
+                if(myPaint.p2.y>=myPaint.p1.y){
+                    myPaint.ctx.rect(myPaint.p1.x,myPaint.p1.y,-width,height);
+                }else{
+                    myPaint.ctx.rect(myPaint.p1.x,myPaint.p1.y,-width,-height);
+                }
+
+            }
+
+
+            myPaint.ctx.stroke();
+
+            myPaint.ctx.save();
+
+        }
+
+        $("#but").bind('click', function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '{{ url_for('test_tracking') }}');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            var data = JSON.stringify({x: myPaint.p1.x, y:myPaint.p1.y, x1:myPaint.p2.x, y1:myPaint.p2.y})
+            xhr.send(data);
+            window.location.href = '{{ url_for('play_video', filepath=filepath) }}';
+        })
+    }
+
+
+    var  mp = new MyPaint('cav');
+
+    mp.paintRect();
+
+
+</script>
+
+</body>
+</html>

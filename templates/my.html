@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        header {
+          background-color: #333;
+          padding: 10px;
+          border-radius: 20px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto;
+        }
+
+        nav ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+        }
+
+        nav li:first-child {
+          grid-column: 1 / 2;
+          justify-self: center;
+        }
+        nav li:last-child {
+          grid-column: 2 / 3;
+          justify-self: center;
+        }
+
+        nav a {
+          color: #fff;
+          text-decoration: none;
+        }
+
+		.rounded-box {
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          padding: 10px;
+            margin-top: 10px;
+          overflow-y: scroll;
+          max-height: 400px;
+        }
+        .file {
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+        .submit {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .file-upload {
+          position: relative;
+          display: inline-block;
+        }
+
+        .file-upload input[type="file"] {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 35%;
+          height: 100%;
+          opacity: 0;
+          cursor: pointer;
+        }
+
+        .file-upload label {
+          display: inline-block;
+          padding: 8px 16px;
+          background-color: #2196F3;
+          color: #fff;
+          border-radius: 4px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+        }
+
+        .file-upload label:hover {
+          background-color: #0c7cd5;
+        }
+
+        #file-name {
+          display: inline-block;
+          margin-left: 16px;
+          color: #666;
+        }
+
+        #upload-btn {
+          display: inline-block;
+          margin-left: 16px;
+          background-color: #4CAF50;
+          color: #fff;
+          border-radius: 4px;
+          font-size: 16px;
+          font-weight: 500;
+          padding: 8px 16px;
+          cursor: pointer;
+        }
+
+        #upload-btn:hover {
+          background-color: #388E3C;
+        }
+
+        .file {
+          display: flex;
+          align-items: center;
+          padding: 10px;
+          background-color: #f0f0f0;
+          margin-bottom: 5px;
+        }
+
+        .select-button, .delete-button {
+          background-color: #4CAF50;
+          color: #fff;
+          border: none;
+          padding: 5px 10px;
+          margin-right: 10px;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+        .select-button:hover, .delete-button:hover {
+          background-color: #3e8e41;
+        }
+
+        .file-name {
+          flex: 1;
+        }
+	</style>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">我的视频</a></li>
+        </ul>
+    </nav>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('pre') }}">目标追踪</a></li>
+        </ul>
+    </nav>
+</header>
+    <div id="file-list" class="rounded-box">
+    <!-- 文件列表将在这里显示 -->
+    </div>
+
+    <div class="submit">
+        <div class="file-upload">
+            <input type="file" id="file-input">
+            <label for="file-input">选择文件</label>
+            <span id="file-name">未选择文件</span>
+
+            <button id="upload-btn">上传</button>
+        </div>
+    </div>
+<script>
+		const fileListDiv = document.getElementById("file-list");
+        // 发送HTTP请求获取文件列表
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "/get_file_list");
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            // 将文件列表渲染到div中
+            const fileList = xhr.responseText.split("\n");
+            if(fileList[0] == '') {
+                fileList.pop();
+            }
+            fileList.forEach(function(file) {
+                const fileDiv = document.createElement("div");
+                fileDiv.className = "file";
+
+                // 创建删除按钮
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "删除";
+                deleteButton.className = "delete-button";
+                fileDiv.appendChild(deleteButton);
+
+                // 添加文件名称
+                const fileName = document.createElement("span");
+                fileName.textContent = file;
+                fileName.className = "file-name";
+                fileDiv.appendChild(fileName);
+
+                fileListDiv.appendChild(fileDiv);
+            });
+          } else {
+            console.log("请求失败：" + xhr.status);
+          }
+        };
+        xhr.send();
+
+        const fileList = document.getElementById("file-list");
+
+            fileList.addEventListener("click", function(event) {
+              if (event.target.classList.contains("delete-button")) {
+                const fileDiv = event.target.parentNode;
+                const fileName = fileDiv.querySelector(".file-name").textContent;
+                deleteFile(fileName, function() {
+                  fileDiv.remove();
+                });
+              }
+            });
+
+            function deleteFile(fileName, callback) {
+              const xhr = new XMLHttpRequest();
+              xhr.open("DELETE", "/delete_file?name=" + encodeURIComponent(fileName));
+              xhr.onload = function() {
+                if (xhr.status === 200) {
+                      window.alert('删除成功');
+                      location.reload(true);
+                } else {
+                  window.alert('删除成功');
+                }
+              };
+              xhr.send();
+            }
+
+
+          const fileInput = document.getElementById('file-input');
+          const fileName = document.getElementById('file-name');
+          const uploadBtn = document.getElementById('upload-btn');
+
+          fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+              fileName.textContent = file.name;
+              uploadBtn.disabled = false;
+            } else {
+              fileName.textContent = '未选择文件';
+              uploadBtn.disabled = true;
+            }
+          });
+
+          uploadBtn.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState === XMLHttpRequest.DONE) {
+                  const  data = JSON.parse(xhr.responseText)
+                if (data.st === 200) {
+                  window.alert('上传成功');
+                  location.reload(true); // 强制刷新并清空缓存
+                } else {
+                  window.alert(data.msg);
+                }
+              }
+            };
+            xhr.send(formData);
+          });
+
+
+	</script>
+</body>
+</html>
